@@ -81,7 +81,6 @@ public class HeatPumpModelManager implements HeatPumpModel {
         support.removePropertyChangeListener(listener);
     }
 
-    @Override
     public void fireEvent(String propertyName, Object value) {
         support.firePropertyChange(propertyName, null, value);
     }
