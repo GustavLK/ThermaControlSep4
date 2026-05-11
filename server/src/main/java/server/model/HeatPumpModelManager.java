@@ -2,11 +2,11 @@ package server.model;
 
 import java.util.List;
 
-package server.model;
-
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.util.List;
+import shared.dto.AlarmType;
+import shared.dto.SensorDataDTO;
+
 
 public class HeatPumpModelManager implements HeatPumpModel {
     private HeatPumpClientList list;
@@ -53,11 +53,9 @@ public class HeatPumpModelManager implements HeatPumpModel {
             triggerAlarm(AlarmType.TEMPERATURE_TOO_HIGH, data.getClientId());
         }
 
-        if (data.getEnergy() > threshold.getEnergyMax()) {
-            triggerAlarm(AlarmType.ENERGY_MAX_EXCEEDED, data.getClientId());
-        }
 
-        if (data.getCop() < threshold.getCopMin()) {
+
+        if (data.getCOP() < threshold.getCopMin()) {
             triggerAlarm(AlarmType.COP_BELOW_MIN, data.getClientId());
         }
     }

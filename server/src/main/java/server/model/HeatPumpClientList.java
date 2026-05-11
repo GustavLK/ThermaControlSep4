@@ -10,7 +10,7 @@ public class HeatPumpClientList {
     public HeatPumpClientList() {
     }
 
-    public int addClient(String name) {
+    public int addClient(String name, ThresholdConfiguration threshold) {
         lastUsedId++;
         HeatPumpClient client = new HeatPumpClient(lastUsedId, name);
         clients.add(client);
@@ -32,6 +32,10 @@ public class HeatPumpClientList {
                 return client;
             }
         return null;
+    }
+
+    public List<HeatPumpClient> getAll() {
+        return clients;
     }
 }
 
