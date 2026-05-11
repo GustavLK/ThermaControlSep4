@@ -1,4 +1,11 @@
 package server.model;
 
 public enum AlarmType {
+    WATER_FLOW_LOW,
+    WATER_FLOW_HIGH,
+    TEMPERATURE_TOO_LOW,
+    TEMPERATURE_TOO_HIGH,
+    ENERGY_MAX_EXCEEDED,
+    COP_BELOW_MIN,
+    CLIENT_OFFLINE,
 }
