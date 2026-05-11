@@ -1,5 +1,8 @@
 package server.model;
 
+import shared.dto.AlarmStatus;
+import shared.dto.AlarmType;
+
 import java.time.LocalDateTime;
 
 public class Alarm {

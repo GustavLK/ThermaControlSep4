@@ -1,4 +1,4 @@
-package server.model;
+package shared.dto;
 
 public enum AlarmStatus {
     ACTIVE,

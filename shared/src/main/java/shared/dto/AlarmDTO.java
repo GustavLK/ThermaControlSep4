@@ -1,5 +1,4 @@
 package shared.dto;
-
 public class AlarmDTO {
     private AlarmType alarmType;
     private String timestamp;
