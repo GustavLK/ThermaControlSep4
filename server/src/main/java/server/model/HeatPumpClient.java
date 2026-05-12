@@ -6,10 +6,11 @@ public class HeatPumpClient {
     private ConnectionStatus connectionStatus;
     private ThresholdConfiguration threshold;
 
-    public HeatPumpClient(int id, String name) {
+    public HeatPumpClient(int id, String clientName, ThresholdConfiguration threshold) {
         this.id = id;
-        this.clientName = name;
-        this.connectionStatus = ConnectionStatus.DISCONNECTED;
+        this.clientName = clientName;
+        this.threshold = threshold;
+        this.connectionStatus = ConnectionStatus.CONNECTED;
     }
 
     public int getId() {
@@ -19,15 +20,16 @@ public class HeatPumpClient {
     public String getName() {
         return clientName;
     }
-    public ConnectionStatus getStatus(){
+
+    public ConnectionStatus getStatus() {
         return connectionStatus;
     }
 
     public ThresholdConfiguration getThreshold() {
         return threshold;
     }
-    public void setStatus(ConnectionStatus status){
+
+    public void setStatus(ConnectionStatus status) {
         this.connectionStatus = status;
     }
-
 }

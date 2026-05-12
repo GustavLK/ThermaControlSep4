@@ -1,46 +1,38 @@
 package server.socket;
 
+import server.model.HeatPumpModelManager;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class ServerSocketManager {
-    private ServerSocket welcomeSocket;
-    private ServerClientHandlerPool HANDLER_POOL;
-    private int port;
+public class ServerSocketManager implements Runnable {
+    private ServerSocket serverSocket;
+    private HeatPumpModelManager modelManager;
+    private boolean running;
 
-    public ServerSocketManager(int port) throws IOException {
-        this.port = port;
-        this.welcomeSocket = new ServerSocket(port);
-        this.HANDLER_POOL = new ServerClientHandlerPool();
+    public ServerSocketManager(int port, HeatPumpModelManager modelManager) throws IOException {
+        this.serverSocket = new ServerSocket(port);
+        this.modelManager = modelManager;
+        this.running = true;
     }
-    public void run(){
-        startListening();
-    }
-    public void startListening() {
-        while (true) {
+
+    @Override
+    public void run() {
+        System.out.println("Server started on port " + serverSocket.getLocalPort());
+        System.out.println("Waiting for clients...");
+
+        while (running) {
             try {
-                Socket socket = welcomeSocket.accept();
-                spawnClientHandler(socket);
+                Socket socket = serverSocket.accept();
+                System.out.println("Client connected");
+
+                ServerClientHandler handler = new ServerClientHandler(socket, modelManager);
+                new Thread(handler).start();
+
             } catch (IOException e) {
-                e.printStackTrace();
-                break;
+                System.out.println("Error accepting client");
             }
         }
-    }
-    public void broadcast(String message){
-        HANDLER_POOL.broadcast(message,null);
-    }
-    public void stopServer() {
-        try {
-            welcomeSocket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    private void spawnClientHandler(Socket socket) throws IOException {
-        ServerClientHandler handler = new ServerClientHandler(socket);
-        HANDLER_POOL.add(handler);
-        new Thread(handler).start();
     }
 }

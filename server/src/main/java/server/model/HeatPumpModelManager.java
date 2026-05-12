@@ -1,12 +1,11 @@
 package server.model;
 
-import java.util.List;
-
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.List;
+
 import shared.dto.AlarmType;
 import shared.dto.SensorDataDTO;
-
 
 public class HeatPumpModelManager implements HeatPumpModel {
     private HeatPumpClientList list;
@@ -17,10 +16,21 @@ public class HeatPumpModelManager implements HeatPumpModel {
         list = new HeatPumpClientList();
         alarms = new AlarmList();
         support = new PropertyChangeSupport(this);
+
+        addClient("Test heat pump", new ThresholdConfiguration(
+                3.0,
+                28.0,
+                -3.0,
+                2.0,
+                100.0,
+                2.5
+        ));
     }
 
     @Override
     public void receiveData(SensorDataDTO dto) {
+        System.out.println("ModelManager received DTO from clientId: " + dto.getClientId());
+
         evaluateThresholds(dto);
 
         fireEvent("sensorData", dto);
@@ -54,10 +64,9 @@ public class HeatPumpModelManager implements HeatPumpModel {
         }
 
 
-
-        if (data.getCOP() < threshold.getCopMin()) {
-            triggerAlarm(AlarmType.COP_BELOW_MIN, data.getClientId());
-        }
+         if (data.getCOP() < threshold.getCopMin()) {
+             triggerAlarm(AlarmType.COP_BELOW_MIN, data.getClientId());
+         }
     }
 
     @Override
@@ -81,6 +90,7 @@ public class HeatPumpModelManager implements HeatPumpModel {
         support.removePropertyChangeListener(listener);
     }
 
+    @Override
     public void fireEvent(String propertyName, Object value) {
         support.firePropertyChange(propertyName, null, value);
     }

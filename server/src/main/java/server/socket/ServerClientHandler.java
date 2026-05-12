@@ -1,51 +1,86 @@
 package server.socket;
 
-import shared.socket.JsonMessage;
-import shared.socket.MessageType;
+import server.model.HeatPumpModelManager;
+import shared.dto.SensorDataDTO;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.io.InputStreamReader;
 
-public class ServerClientHandler implements Runnable{
+public class ServerClientHandler implements Runnable {
+    private Socket socket;
     private BufferedReader in;
     private PrintWriter out;
-    private String CLIENT_ADDRESS;
-    private PropertyChangeSupport SUPPORT;
+    private HeatPumpModelManager modelManager;
 
-    public ServerClientHandler(Socket socket) throws IOException {
-        this.CLIENT_ADDRESS = socket.getInetAddress().getHostAddress();
-        this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        this.out = new PrintWriter(socket.getOutputStream(), true);
-        this.SUPPORT = new PropertyChangeSupport(this);
-    }
-    @Override
-    public void run() {
+    public ServerClientHandler(Socket socket, HeatPumpModelManager modelManager) {
+        this.socket = socket;
+        this.modelManager = modelManager;
+
         try {
-            String line;
-            while ((line = in.readLine()) != null) {
-                SUPPORT.firePropertyChange("message", null, line);
-            }
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            out = new PrintWriter(socket.getOutputStream(), true);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Error creating streams");
         }
     }
+
+    @Override
+    public void run() {
+        System.out.println("Handler started");
+
+        try {
+            String message;
+
+            while ((message = in.readLine()) != null) {
+                System.out.println("Server received: " + message);
+
+                SensorDataDTO dto = parseSensorData(message);
+
+                modelManager.receiveData(dto);
+
+                send("ACK");
+            }
+
+        } catch (IOException e) {
+            System.out.println("Client disconnected");
+        }
+    }
+
+    private SensorDataDTO parseSensorData(String message) {
+        String[] parts = message.split(";");
+
+        int clientId = 0;
+        double temperature = 0;
+        double waterFlow = 0;
+        double COP = 3.2;
+
+        for (String part : parts) {
+            String[] keyValue = part.split("=");
+
+            if (keyValue.length != 2) {
+                continue;
+            }
+
+            if (keyValue[0].equals("clientId")) {
+                clientId = Integer.parseInt(keyValue[1]);
+            } else if (keyValue[0].equals("temperature")) {
+                temperature = Double.parseDouble(keyValue[1]);
+            } else if (keyValue[0].equals("waterFlow")) {
+                waterFlow = Double.parseDouble(keyValue[1]);
+            } else if (keyValue[0].equals("COP")) {
+                COP = Double.parseDouble(keyValue[1]);
+            }
+        }
+
+        return new SensorDataDTO(clientId, waterFlow, temperature, COP);
+    }
+
     public void send(String message) {
-        out.println(message);
-    }
-    public void addListener(PropertyChangeListener listener){
-        SUPPORT.addPropertyChangeListener(listener);
-    }
-    public void removeListener(PropertyChangeListener listener){
-        SUPPORT.removePropertyChangeListener(listener);
-    }
-    public void sendAck(ServerClientHandler handler){
-        JsonMessage ack = new JsonMessage();
-        ack.setValues(MessageType.ACKNOWLEDGEMENT,"OK");
-        handler.send(ack.toJson());
+        if (out != null) {
+            out.println(message);
+        }
     }
 }

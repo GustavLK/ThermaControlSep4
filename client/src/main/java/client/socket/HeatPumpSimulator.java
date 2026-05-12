@@ -18,10 +18,12 @@ public class HeatPumpSimulator {
             while (running) {
                 double temperature = generateBrineTemperature();
                 double waterFlow = generateWaterFlow();
+                double COP = generateCOP();
 
                 String message = "clientId=" + clientId
                         + ";temperature=" + temperature
-                        + ";waterFlow=" + waterFlow;
+                        + ";waterFlow=" + waterFlow
+                        + ";COP=" + COP;
 
                 socketManager.sendData(message);
 
@@ -41,7 +43,6 @@ public class HeatPumpSimulator {
     }
 
     private double generateBrineTemperature() {
-        // Realistisk thermonet/brine-temperatur baseret på jeres Excel:
         // long-term ca. 0.99 °C, winter ca. -1.19 °C, peak ca. -2.50 °C
         double min = -2.8;
         double max = 1.5;
@@ -55,6 +56,15 @@ public class HeatPumpSimulator {
         // baseret på winter load ca. 0.9-8.1 kW og dT = 3 °C.
         double min = 3.0;
         double max = 28.0;
+
+        return round(min + Math.random() * (max - min));
+    }
+
+    private double generateCOP() {
+        // Realistisk COP omkring jeres winter COP ca. 3.4
+        // Nogle værdier kan komme under 2.5, så alarm kan testes.
+        double min = 2.2;
+        double max = 4.0;
 
         return round(min + Math.random() * (max - min));
     }

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HeatPumpClientList {
-    private int lastUsedId = -1;
+    private int lastUsedId = 0;
     private List<HeatPumpClient> clients = new ArrayList<>();
 
     public HeatPumpClientList() {
@@ -12,25 +12,25 @@ public class HeatPumpClientList {
 
     public int addClient(String name, ThresholdConfiguration threshold) {
         lastUsedId++;
-        HeatPumpClient client = new HeatPumpClient(lastUsedId, name);
+
+        HeatPumpClient client = new HeatPumpClient(lastUsedId, name, threshold);
+
         clients.add(client);
+
         return lastUsedId;
     }
 
     public void removeClient(int id) {
-        for (HeatPumpClient client : clients) {
-            if (client.getId() == id) {
-                clients.remove(client);
-                break;
-            }
-        }
+        clients.removeIf(client -> client.getId() == id);
     }
 
     public HeatPumpClient getClientById(int id) {
-        for (HeatPumpClient client : clients)
+        for (HeatPumpClient client : clients) {
             if (client.getId() == id) {
                 return client;
             }
+        }
+
         return null;
     }
 
@@ -38,4 +38,3 @@ public class HeatPumpClientList {
         return clients;
     }
 }
-
