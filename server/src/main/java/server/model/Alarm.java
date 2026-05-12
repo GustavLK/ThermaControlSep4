@@ -18,12 +18,6 @@ public class Alarm {
         this.status = status;
         this.clientId = clientId;
     }
-    public Alarm(AlarmType alarmType, int clientId) {
-        this.alarmType = alarmType;
-        this.clientId = clientId;
-        this.timestamp = LocalDateTime.now();
-        this.status = AlarmStatus.ACTIVE;
-    }
 
     public AlarmType getAlarmType() {
         return alarmType;
