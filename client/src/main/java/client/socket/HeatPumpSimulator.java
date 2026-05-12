@@ -1,5 +1,10 @@
 package client.socket;
 
+import com.google.gson.Gson;
+import shared.dto.SensorDataDTO;
+import shared.socket.JsonMessage;
+import shared.socket.MessageType;
+
 public class HeatPumpSimulator {
     private ClientSocketManager socketManager;
     private boolean running;
@@ -20,12 +25,10 @@ public class HeatPumpSimulator {
                 double waterFlow = generateWaterFlow();
                 double COP = generateCOP();
 
-                String message = "clientId=" + clientId
-                        + ";temperature=" + temperature
-                        + ";waterFlow=" + waterFlow
-                        + ";COP=" + COP;
-
-                socketManager.sendData(message);
+                SensorDataDTO dto = new SensorDataDTO(clientId, waterFlow, temperature, COP);
+                JsonMessage msg = new JsonMessage();
+                msg.setValues(MessageType.SENSOR_DATA_REQUEST, new Gson().toJson(dto));
+                socketManager.sendData(msg.toJson());
 
                 try {
                     Thread.sleep(3000);

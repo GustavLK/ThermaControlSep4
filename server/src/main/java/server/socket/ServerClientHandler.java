@@ -1,7 +1,9 @@
 package server.socket;
 
+import com.google.gson.Gson;
 import server.model.HeatPumpModelManager;
 import shared.dto.SensorDataDTO;
+import shared.socket.JsonMessage;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -37,7 +39,8 @@ public class ServerClientHandler implements Runnable {
             while ((message = in.readLine()) != null) {
                 System.out.println("Server received: " + message);
 
-                SensorDataDTO dto = parseSensorData(message);
+                JsonMessage msg = JsonMessage.fromJson(message);
+                SensorDataDTO dto = new Gson().fromJson(msg.getPayload(), SensorDataDTO.class);
 
                 modelManager.receiveData(dto);
 
@@ -47,35 +50,6 @@ public class ServerClientHandler implements Runnable {
         } catch (IOException e) {
             System.out.println("Client disconnected");
         }
-    }
-
-    private SensorDataDTO parseSensorData(String message) {
-        String[] parts = message.split(";");
-
-        int clientId = 0;
-        double temperature = 0;
-        double waterFlow = 0;
-        double COP = 3.2;
-
-        for (String part : parts) {
-            String[] keyValue = part.split("=");
-
-            if (keyValue.length != 2) {
-                continue;
-            }
-
-            if (keyValue[0].equals("clientId")) {
-                clientId = Integer.parseInt(keyValue[1]);
-            } else if (keyValue[0].equals("temperature")) {
-                temperature = Double.parseDouble(keyValue[1]);
-            } else if (keyValue[0].equals("waterFlow")) {
-                waterFlow = Double.parseDouble(keyValue[1]);
-            } else if (keyValue[0].equals("COP")) {
-                COP = Double.parseDouble(keyValue[1]);
-            }
-        }
-
-        return new SensorDataDTO(clientId, waterFlow, temperature, COP);
     }
 
     public void send(String message) {
