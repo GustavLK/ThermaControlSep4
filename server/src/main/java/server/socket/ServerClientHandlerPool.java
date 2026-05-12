@@ -12,7 +12,7 @@ public class ServerClientHandlerPool {
     public void add(ServerClientHandler handler){
         handlers.add(handler);
     }
-    public void broadcast(String message, ServerClientHandler source){
+    public void broadcast(String message, ServerClientHandler source){ //
         for (ServerClientHandler handler : handlers) {
             if (handler != source) {
                 handler.send(message);
