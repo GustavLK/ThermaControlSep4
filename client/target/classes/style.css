@@ -1,0 +1,50 @@
+/* Tabelrækker */
+.table-row-cell:odd {
+    -fx-background-color: #1a2535;
+}
+.table-row-cell:even {
+    -fx-background-color: #111827;
+}
+.table-row-cell .text {
+    -fx-fill: #e8f4fd;
+}
+
+/* Tabelhoveder */
+.table-view .column-header {
+    -fx-background-color: #0d1520;
+    -fx-border-color: #1e3a52;
+}
+.table-view .column-header .label {
+    -fx-text-fill: #7ab3cc;
+    -fx-font-weight: bold;
+}
+
+/* Graf */
+.chart-plot-background {
+    -fx-background-color: #0d1a2a;
+}
+.chart-horizontal-grid-lines {
+    -fx-stroke: #1e3a52;
+}
+.chart-vertical-grid-lines {
+    -fx-stroke: #1e3a52;
+}
+.default-color0.chart-series-line {
+    -fx-stroke: #7ab3cc;
+    -fx-stroke-width: 2px;
+}
+.list-view {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+.list-cell {
+    -fx-background-color: #1a2535;
+    -fx-text-fill: #e8f4fd;
+    -fx-padding: 8 12;
+}
+.list-cell:selected {
+    -fx-background-color: #1e5a8a;
+}
+.list-cell:empty {
+    -fx-background-color: transparent;
+}
