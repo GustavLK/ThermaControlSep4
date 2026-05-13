@@ -4,12 +4,14 @@ import com.google.gson.Gson;
 import server.model.HeatPumpModelManager;
 import shared.dto.SensorDataDTO;
 import shared.socket.JsonMessage;
+import shared.socket.MessageType;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+
 
 public class ServerClientHandler implements Runnable {
     private Socket socket;
@@ -27,6 +29,15 @@ public class ServerClientHandler implements Runnable {
         } catch (IOException e) {
             System.out.println("Error creating streams");
         }
+        // Tilføj i constructoren efter de andre linjer:
+        modelManager.addListener(event -> {
+            if (event.getPropertyName().equals("alarm")) {
+                JsonMessage alarmMsg = new JsonMessage();
+                alarmMsg.setValues(MessageType.ALARM_NOTIFICATION,
+                        new Gson().toJson(event.getNewValue()));
+                send(alarmMsg.toJson());
+            }
+        });
     }
 
     @Override
@@ -44,7 +55,9 @@ public class ServerClientHandler implements Runnable {
 
                 modelManager.receiveData(dto);
 
-                send("ACK");
+                JsonMessage ack = new JsonMessage();
+                ack.setValues(MessageType.ACKNOWLEDGEMENT, msg.getPayload());
+                send(ack.toJson());
             }
 
         } catch (IOException e) {

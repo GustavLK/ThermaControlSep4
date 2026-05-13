@@ -2,6 +2,10 @@ package client.model;
 
 import client.socket.ClientSocketManager;
 import client.socket.HeatPumpSimulator;
+import com.google.gson.Gson;
+import shared.dto.SensorDataDTO;
+import shared.socket.JsonMessage;
+import shared.socket.MessageType;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -51,10 +55,16 @@ public class ModelHandler implements PropertyChangeListener {
 
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-        support.firePropertyChange(
-                event.getPropertyName(),
-                event.getOldValue(),
-                event.getNewValue()
-        );
+        if (event.getPropertyName().equals("messageReceived")) {
+            String raw = (String) event.getNewValue();
+            JsonMessage msg = JsonMessage.fromJson(raw);
+
+            if (msg.getType() == MessageType.ACKNOWLEDGEMENT) {
+                SensorDataDTO dto = new Gson().fromJson(msg.getPayload(), SensorDataDTO.class);
+                support.firePropertyChange("sensorData", null, dto);
+            } else if (msg.getType() == MessageType.ALARM_NOTIFICATION) {
+                support.firePropertyChange("alarm", null, msg.getPayload());
+            }
+        }
     }
 }

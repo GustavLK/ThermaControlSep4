@@ -32,8 +32,10 @@ public class AlarmLogViewController implements BaseViewController, PropertyChang
     public static class AlarmRow {
         public String time, clientId, type, status;
         public AlarmRow(String time, String clientId, String type, String status) {
-            this.time = time; this.clientId = clientId;
-            this.type = type; this.status = status;
+            this.time = time;
+            this.clientId = clientId;
+            this.type = type;
+            this.status = status;
         }
     }
 
@@ -52,6 +54,13 @@ public class AlarmLogViewController implements BaseViewController, PropertyChang
         alarmTable.setItems(alarmRows);
 
         filterField.textProperty().addListener((obs, old, newVal) -> filterAlarms(newVal));
+
+        for (String alarm : alarmViewModel.getAlarmLog()) {
+            com.google.gson.JsonObject obj = new com.google.gson.JsonParser().parse(alarm).getAsJsonObject();
+            String type = obj.get("alarmType").getAsString();
+            String clientId = obj.get("clientId").getAsString();
+            alarmRows.add(0, new AlarmRow(LocalDateTime.now().format(FMT), clientId, type, "ACTIVE"));
+        }
     }
 
     private void filterAlarms(String filter) {
@@ -74,18 +83,29 @@ public class AlarmLogViewController implements BaseViewController, PropertyChang
         if (evt.getPropertyName().equals("alarm")) {
             Platform.runLater(() -> {
                 String raw = evt.getNewValue().toString();
-                alarmRows.add(0, new AlarmRow(
-                        LocalDateTime.now().format(FMT),
-                        "—",
-                        raw,
-                        "ACTIVE"
-                ));
+                com.google.gson.JsonObject obj = new com.google.gson.JsonParser().parse(raw).getAsJsonObject();
+                String type = obj.get("alarmType").getAsString();
+                String clientId = obj.get("clientId").getAsString();
+                alarmRows.add(0, new AlarmRow(LocalDateTime.now().format(FMT), clientId, type, "ACTIVE"));
             });
         }
     }
+    @FXML private void showDashboard() {
+        alarmViewModel.removeListener(this);
+        viewHandler.openView(ViewScene.DASHBOARD);
+    }
 
-    @FXML private void showDashboard() { viewHandler.openView(ViewScene.DASHBOARD); }
-    @FXML private void showAlarmLog() { viewHandler.openView(ViewScene.ALARM_LOG); }
-    @FXML private void showConfig() { viewHandler.openView(ViewScene.CONFIGURATION); }
-    @FXML private void handleLogout() { viewHandler.openView(ViewScene.LOGIN); }
+    @FXML private void showAlarmLog() {
+        viewHandler.openView(ViewScene.ALARM_LOG);
+    }
+
+    @FXML private void showConfig() {
+        alarmViewModel.removeListener(this);
+        viewHandler.openView(ViewScene.CONFIGURATION);
+    }
+
+    @FXML private void handleLogout() {
+        alarmViewModel.removeListener(this);
+        viewHandler.openView(ViewScene.LOGIN);
+    }
 }

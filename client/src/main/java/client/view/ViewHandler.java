@@ -51,6 +51,10 @@ public class ViewHandler {
 
             Scene newScene = new Scene(root, width, height);
             primaryStage.setScene(newScene);
+            URL cssUrl = getClass().getResource("/style.css");
+            if (cssUrl != null) {
+                newScene.getStylesheets().add(cssUrl.toExternalForm());
+            }
 
         } catch (IOException e) {
             e.printStackTrace();

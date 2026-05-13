@@ -1,16 +1,16 @@
 package client.view;
 
+import client.viewmodel.AlarmViewModel;
 import client.viewmodel.DashboardViewModel;
 import client.viewmodel.ViewModelHandler;
 import client.viewmodel.ViewScene;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
-import javafx.scene.control.TextInputDialog;
-import javafx.scene.control.Alert;
 import shared.dto.SensorDataDTO;
 
 import java.beans.PropertyChangeEvent;
@@ -35,13 +35,11 @@ public class DashboardViewController implements BaseViewController, PropertyChan
 
     private ViewHandler viewHandler;
     private DashboardViewModel dashboardViewModel;
-
-    // Track pumps
-    private List<Integer> clientIds = new ArrayList<>();
-    private Map<Integer, String> clientNames = new HashMap<>();
-    private Map<Integer, List<Double>> waterFlowHistory = new HashMap<>();
-    private Map<Integer, List<String>> timeHistory = new HashMap<>();
+    private AlarmViewModel alarmViewModel;
     private int selectedClientId = -1;
+    private int lastChartClientId = -1;
+
+    private ObservableList<XYChart.Data<String, Number>> chartData = FXCollections.observableArrayList();
 
     private static final DateTimeFormatter TIME_FMT = DateTimeFormatter.ofPattern("HH:mm:ss");
 
@@ -49,27 +47,55 @@ public class DashboardViewController implements BaseViewController, PropertyChan
     public void init(ViewHandler viewHandler, ViewModelHandler viewModelHandler) {
         this.viewHandler = viewHandler;
         this.dashboardViewModel = viewModelHandler.getDashboardViewModel();
-        dashboardViewModel.addListener(this);
+        this.alarmViewModel = viewModelHandler.getAlarmViewModel();
 
+        dashboardViewModel.addListener(this);
+        alarmViewModel.addListener(this);
+
+        setupChart();
         setupListView();
+        updateList(null);
+
+        if (!dashboardViewModel.getClientIds().isEmpty()) {
+            selectedClientId = dashboardViewModel.getClientIds().get(0);
+            pumpListView.getSelectionModel().select(0);
+            rebuildChart(selectedClientId);
+            updateLabels(selectedClientId);
+        }
+
+        // Vis seneste alarm hvis der er nogen
+        List<String> existingAlarms = alarmViewModel.getAlarmLog();
+        if (!existingAlarms.isEmpty()) {
+            alarmLabel.setText(existingAlarms.get(existingAlarms.size() - 1));
+        }
+    }
+
+    private void setupChart() {
+        XYChart.Series<String, Number> series = new XYChart.Series<>();
+        series.setName("Water Flow L/min");
+        series.setData(chartData);
+        waterflowChart.getData().add(series);
     }
 
     private void setupListView() {
         pumpListView.getSelectionModel().selectedIndexProperty().addListener((obs, oldVal, newVal) -> {
             int index = newVal.intValue();
-            if (index >= 0 && index < clientIds.size()) {
-                selectedClientId = clientIds.get(index);
-                showPump(selectedClientId);
+            if (index >= 0 && index < dashboardViewModel.getClientIds().size()) {
+                int id = dashboardViewModel.getClientIds().get(index);
+                if (id != selectedClientId) {
+                    selectedClientId = id;
+                    rebuildChart(selectedClientId);
+                    updateLabels(selectedClientId);
+                }
             }
         });
-
         searchField.textProperty().addListener((obs, old, newVal) -> updateList(newVal));
     }
 
     private void updateList(String search) {
         List<String> items = new ArrayList<>();
-        for (int id : clientIds) {
-            String name = clientNames.getOrDefault(id, "Pump " + id);
+        for (int id : dashboardViewModel.getClientIds()) {
+            String name = dashboardViewModel.getClientNames().getOrDefault(id, "Pump " + id);
             if (search == null || search.isEmpty()
                     || name.toLowerCase().contains(search.toLowerCase())) {
                 items.add(name + "  |  HP-00" + id);
@@ -78,8 +104,8 @@ public class DashboardViewController implements BaseViewController, PropertyChan
         pumpListView.setItems(FXCollections.observableArrayList(items));
     }
 
-    private void showPump(int clientId) {
-        String name = clientNames.getOrDefault(clientId, "Pump " + clientId);
+    private void updateLabels(int clientId) {
+        String name = dashboardViewModel.getClientNames().getOrDefault(clientId, "Pump " + clientId);
         pumpNameLabel.setText(name);
         pumpIdLabel.setText("HP-00" + clientId);
         statusLabel.setText("Online");
@@ -92,23 +118,30 @@ public class DashboardViewController implements BaseViewController, PropertyChan
             energyLabel.setText(String.valueOf(latest.getEnergyConsumption()));
             copLabel.setText(String.valueOf(latest.getCOP()));
         }
-
-        updateChart(clientId);
     }
 
-    private void updateChart(int clientId) {
-        waterflowChart.getData().clear();
-        List<Double> history = waterFlowHistory.getOrDefault(clientId, new ArrayList<>());
-        List<String> times = timeHistory.getOrDefault(clientId, new ArrayList<>());
+    private void rebuildChart(int clientId) {
+        List<Double> history = dashboardViewModel.getWaterFlowHistory().getOrDefault(clientId, new ArrayList<>());
+        List<String> times = dashboardViewModel.getTimeHistory().getOrDefault(clientId, new ArrayList<>());
 
-        XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.setName("Water Flow L/min");
-
+        chartData.clear();
         for (int i = 0; i < history.size(); i++) {
-            series.getData().add(new XYChart.Data<>(times.get(i), history.get(i)));
+            chartData.add(new XYChart.Data<>(times.get(i), history.get(i)));
         }
+        lastChartClientId = clientId;
+    }
 
-        waterflowChart.getData().add(series);
+    private void addLatestPoint(int clientId) {
+        List<Double> history = dashboardViewModel.getWaterFlowHistory().getOrDefault(clientId, new ArrayList<>());
+        List<String> times = dashboardViewModel.getTimeHistory().getOrDefault(clientId, new ArrayList<>());
+
+        if (!history.isEmpty()) {
+            int last = history.size() - 1;
+            chartData.add(new XYChart.Data<>(times.get(last), history.get(last)));
+            if (chartData.size() > 10) {
+                chartData.remove(0);
+            }
+        }
     }
 
     @Override
@@ -118,37 +151,57 @@ public class DashboardViewController implements BaseViewController, PropertyChan
             Platform.runLater(() -> {
                 int id = dto.getClientId();
 
-                // Register new pump if not seen before
-                if (!clientIds.contains(id)) {
-                    clientIds.add(id);
-                    clientNames.put(id, "Pump " + id);
-                    waterFlowHistory.put(id, new ArrayList<>());
-                    timeHistory.put(id, new ArrayList<>());
+                if (!dashboardViewModel.getClientIds().contains(id)) {
+                    dashboardViewModel.getClientIds().add(id);
+                    dashboardViewModel.getClientNames().put(id, "Pump " + id);
+                    dashboardViewModel.getWaterFlowHistory().put(id, new ArrayList<>());
+                    dashboardViewModel.getTimeHistory().put(id, new ArrayList<>());
                     updateList(searchField.getText());
                 }
 
-                // Update history (keep last 10 points)
-                List<Double> wfHistory = waterFlowHistory.get(id);
-                List<String> tHistory = timeHistory.get(id);
-                wfHistory.add(dto.getWaterFlow());
-                tHistory.add(LocalTime.now().format(TIME_FMT));
-                if (wfHistory.size() > 10) {
-                    wfHistory.remove(0);
-                    tHistory.remove(0);
+                if (selectedClientId == -1) {
+                    selectedClientId = id;
+                    pumpListView.getSelectionModel().select(0);
                 }
 
-                // Update displayed pump if selected
                 if (id == selectedClientId) {
-                    showPump(id);
+                    updateLabels(id);
+                    addLatestPoint(id);
                 }
             });
         }
+
+        // Vis alarm i boksen nederst på dashboard
+        if (evt.getPropertyName().equals("alarm")) {
+            Platform.runLater(() -> {
+                String raw = evt.getNewValue().toString();
+                com.google.gson.JsonObject obj = new com.google.gson.JsonParser().parse(raw).getAsJsonObject();
+                String type = obj.get("alarmType").getAsString();
+                String clientId = obj.get("clientId").getAsString();
+                String time = obj.get("timestamp").getAsString().substring(0, 19);
+                alarmLabel.setText("⚠ " + type + " — Client " + clientId + " — " + time);
+            });
+        }
+    }
+    @FXML private void showDashboard() { viewHandler.openView(ViewScene.DASHBOARD); }
+
+    @FXML private void showAlarmLog() {
+        dashboardViewModel.removeListener(this);
+        alarmViewModel.removeListener(this);
+        viewHandler.openView(ViewScene.ALARM_LOG);
     }
 
-    @FXML private void showDashboard() { viewHandler.openView(ViewScene.DASHBOARD); }
-    @FXML private void showAlarmLog() { viewHandler.openView(ViewScene.ALARM_LOG); }
-    @FXML private void showConfig() { viewHandler.openView(ViewScene.CONFIGURATION); }
-    @FXML private void handleLogout() { viewHandler.openView(ViewScene.LOGIN); }
+    @FXML private void showConfig() {
+        dashboardViewModel.removeListener(this);
+        alarmViewModel.removeListener(this);
+        viewHandler.openView(ViewScene.CONFIGURATION);
+    }
+
+    @FXML private void handleLogout() {
+        dashboardViewModel.removeListener(this);
+        alarmViewModel.removeListener(this);
+        viewHandler.openView(ViewScene.LOGIN);
+    }
 
     @FXML
     private void handleAddPump() {
@@ -156,11 +209,11 @@ public class DashboardViewController implements BaseViewController, PropertyChan
         dialog.setTitle("Add Pump");
         dialog.setHeaderText("Enter pump name:");
         dialog.showAndWait().ifPresent(name -> {
-            int newId = clientIds.size() + 1;
-            clientIds.add(newId);
-            clientNames.put(newId, name);
-            waterFlowHistory.put(newId, new ArrayList<>());
-            timeHistory.put(newId, new ArrayList<>());
+            int newId = dashboardViewModel.getClientIds().size() + 1;
+            dashboardViewModel.getClientIds().add(newId);
+            dashboardViewModel.getClientNames().put(newId, name);
+            dashboardViewModel.getWaterFlowHistory().put(newId, new ArrayList<>());
+            dashboardViewModel.getTimeHistory().put(newId, new ArrayList<>());
             updateList(searchField.getText());
         });
     }
@@ -175,12 +228,14 @@ public class DashboardViewController implements BaseViewController, PropertyChan
         alert.setHeaderText("Are you sure?");
         alert.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
-                int id = clientIds.remove(index);
-                clientNames.remove(id);
-                waterFlowHistory.remove(id);
-                timeHistory.remove(id);
+                int id = dashboardViewModel.getClientIds().remove(index);
+                dashboardViewModel.getClientNames().remove(id);
+                dashboardViewModel.getWaterFlowHistory().remove(id);
+                dashboardViewModel.getTimeHistory().remove(id);
                 updateList(searchField.getText());
                 selectedClientId = -1;
+                lastChartClientId = -1;
+                chartData.clear();
                 pumpNameLabel.setText("Select a pump");
                 pumpIdLabel.setText("");
             }
