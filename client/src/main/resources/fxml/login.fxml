@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.*?>
+
+<StackPane xmlns:fx="http://javafx.com/fxml"
+           fx:controller="client.view.LoginViewController"
+           style="-fx-background-color: #0a0f1a;">
+
+    <VBox alignment="CENTER" spacing="0" maxWidth="420">
+        <!-- Logo area -->
+        <VBox alignment="CENTER" spacing="8" style="-fx-padding: 0 0 40 0;">
+            <Label text="ThermaControl"
+                   style="-fx-text-fill: #e8f4fd; -fx-font-size: 32px; -fx-font-weight: bold; -fx-font-family: 'Georgia';"/>
+            <Label text="Heat Pump Monitoring System"
+                   style="-fx-text-fill: #5a8fa8; -fx-font-size: 13px; -fx-font-family: 'Georgia';"/>
+        </VBox>
+
+        <!-- Card -->
+        <VBox spacing="20"
+              style="-fx-background-color: #111827; -fx-background-radius: 12; -fx-border-color: #1e3a52; -fx-border-radius: 12; -fx-border-width: 1; -fx-padding: 40;">
+
+            <Label text="Sign In"
+                   style="-fx-text-fill: #e8f4fd; -fx-font-size: 20px; -fx-font-weight: bold;"/>
+
+            <VBox spacing="6">
+                <Label text="Username" style="-fx-text-fill: #7ab3cc; -fx-font-size: 12px;"/>
+                <TextField fx:id="usernameField"
+                           promptText="Enter username"
+                           style="-fx-background-color: #1a2535; -fx-text-fill: #e8f4fd; -fx-prompt-text-fill: #3a5a72; -fx-border-color: #1e3a52; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 10 14; -fx-font-size: 14px;"/>
+            </VBox>
+
+            <VBox spacing="6">
+                <Label text="Password" style="-fx-text-fill: #7ab3cc; -fx-font-size: 12px;"/>
+                <PasswordField fx:id="passwordField"
+                               promptText="Enter password"
+                               style="-fx-background-color: #1a2535; -fx-text-fill: #e8f4fd; -fx-prompt-text-fill: #3a5a72; -fx-border-color: #1e3a52; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 10 14; -fx-font-size: 14px;"/>
+            </VBox>
+
+            <Label fx:id="errorLabel" text="Invalid username or password"
+                   visible="false"
+                   style="-fx-text-fill: #e05a5a; -fx-font-size: 12px;"/>
+
+            <Button text="Sign In" onAction="#handleLogin" maxWidth="Infinity"
+                    style="-fx-background-color: #1e5a8a; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 12; -fx-background-radius: 6; -fx-cursor: hand;"/>
+        </VBox>
+    </VBox>
+</StackPane>

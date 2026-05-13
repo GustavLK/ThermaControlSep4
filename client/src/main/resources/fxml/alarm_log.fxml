@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="client.view.AlarmLogViewController"
+            style="-fx-background-color: #0a0f1a;">
+
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="0"
+              style="-fx-background-color: #0d1520; -fx-border-color: #1e3a52; -fx-border-width: 0 0 1 0; -fx-padding: 0 24;">
+            <Label text="ThermaControl"
+                   style="-fx-text-fill: #e8f4fd; -fx-font-size: 18px; -fx-font-weight: bold; -fx-font-family: 'Georgia'; -fx-padding: 16 24 16 0;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="Dashboard" onAction="#showDashboard"
+                    style="-fx-background-color: transparent; -fx-text-fill: #5a8fa8; -fx-border-color: transparent; -fx-padding: 10 18; -fx-cursor: hand;"/>
+            <Button text="Alarm Log" onAction="#showAlarmLog"
+                    style="-fx-background-color: #1e3a52; -fx-text-fill: #7ab3cc; -fx-border-color: transparent; -fx-padding: 10 18; -fx-cursor: hand; -fx-background-radius: 6;"/>
+            <Button text="Configuration" onAction="#showConfig"
+                    style="-fx-background-color: transparent; -fx-text-fill: #5a8fa8; -fx-border-color: transparent; -fx-padding: 10 18; -fx-cursor: hand;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="Logout" onAction="#handleLogout"
+                    style="-fx-background-color: transparent; -fx-text-fill: #5a8fa8; -fx-border-color: transparent; -fx-padding: 10 18; -fx-cursor: hand;"/>
+        </HBox>
+    </top>
+
+    <center>
+        <VBox spacing="20" style="-fx-padding: 32;">
+            <HBox alignment="CENTER_LEFT" spacing="16">
+                <Label text="Alarm Log"
+                       style="-fx-text-fill: #e8f4fd; -fx-font-size: 24px; -fx-font-weight: bold;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <TextField fx:id="filterField" promptText="Filter alarms..."
+                           style="-fx-background-color: #1a2535; -fx-text-fill: #e8f4fd; -fx-prompt-text-fill: #3a5a72; -fx-border-color: #1e3a52; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 8 12; -fx-pref-width: 220;"/>
+            </HBox>
+
+            <TableView fx:id="alarmTable" VBox.vgrow="ALWAYS"
+                       style="-fx-background-color: #111827; -fx-border-color: #1e3a52; -fx-border-radius: 10; -fx-background-radius: 10;">
+                <columns>
+                    <TableColumn fx:id="timeColumn" text="Time" prefWidth="180"
+                                 style="-fx-text-fill: #7ab3cc;"/>
+                    <TableColumn fx:id="clientColumn" text="Client ID" prefWidth="100"
+                                 style="-fx-text-fill: #7ab3cc;"/>
+                    <TableColumn fx:id="typeColumn" text="Alarm Type" prefWidth="220"
+                                 style="-fx-text-fill: #7ab3cc;"/>
+                    <TableColumn fx:id="statusColumn" text="Status" prefWidth="120"
+                                 style="-fx-text-fill: #7ab3cc;"/>
+                </columns>
+            </TableView>
+        </VBox>
+    </center>
+</BorderPane>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="client.view.ConfigViewController"
+            style="-fx-background-color: #0a0f1a;">
+
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="0"
+              style="-fx-background-color: #0d1520; -fx-border-color: #1e3a52; -fx-border-width: 0 0 1 0; -fx-padding: 0 24;">
+            <Label text="ThermaControl"
+                   style="-fx-text-fill: #e8f4fd; -fx-font-size: 18px; -fx-font-weight: bold; -fx-font-family: 'Georgia'; -fx-padding: 16 24 16 0;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="Dashboard" onAction="#showDashboard"
+                    style="-fx-background-color: transparent; -fx-text-fill: #5a8fa8; -fx-border-color: transparent; -fx-padding: 10 18; -fx-cursor: hand;"/>
+            <Button text="Alarm Log" onAction="#showAlarmLog"
+                    style="-fx-background-color: transparent; -fx-text-fill: #5a8fa8; -fx-border-color: transparent; -fx-padding: 10 18; -fx-cursor: hand;"/>
+            <Button text="Configuration" onAction="#showConfig"
+                    style="-fx-background-color: #1e3a52; -fx-text-fill: #7ab3cc; -fx-border-color: transparent; -fx-padding: 10 18; -fx-cursor: hand; -fx-background-radius: 6;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="Logout" onAction="#handleLogout"
+                    style="-fx-background-color: transparent; -fx-text-fill: #5a8fa8; -fx-border-color: transparent; -fx-padding: 10 18; -fx-cursor: hand;"/>
+        </HBox>
+    </top>
+
+    <center>
+        <HBox spacing="24" style="-fx-padding: 32;">
+
+            <!-- Client list -->
+            <VBox spacing="12" minWidth="260"
+                  style="-fx-background-color: #111827; -fx-border-color: #1e3a52; -fx-border-radius: 10; -fx-background-radius: 10; -fx-border-width: 1; -fx-padding: 20;">
+                <Label text="Connected Clients"
+                       style="-fx-text-fill: #7ab3cc; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+                <ListView fx:id="clientList" VBox.vgrow="ALWAYS"
+                          style="-fx-background-color: transparent; -fx-border-color: transparent;"/>
+                <HBox spacing="8">
+                    <Button text="+ Add Client" onAction="#addClientButtonPressed" maxWidth="Infinity" HBox.hgrow="ALWAYS"
+                            style="-fx-background-color: #1e5a8a; -fx-text-fill: white; -fx-padding: 8; -fx-background-radius: 6; -fx-cursor: hand;"/>
+                    <Button text="Remove" onAction="#removeClientButtonPressed" maxWidth="Infinity" HBox.hgrow="ALWAYS"
+                            style="-fx-background-color: #3a1a1a; -fx-text-fill: #e05a5a; -fx-padding: 8; -fx-background-radius: 6; -fx-cursor: hand;"/>
+                </HBox>
+            </VBox>
+
+            <!-- Threshold config -->
+            <VBox spacing="16" HBox.hgrow="ALWAYS"
+                  style="-fx-background-color: #111827; -fx-border-color: #1e3a52; -fx-border-radius: 10; -fx-background-radius: 10; -fx-border-width: 1; -fx-padding: 24;">
+                <Label text="Threshold Configuration"
+                       style="-fx-text-fill: #7ab3cc; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+
+                <GridPane hgap="16" vgap="12">
+                    <Label text="Water Flow Min (L/min)" GridPane.columnIndex="0" GridPane.rowIndex="0"
+                           style="-fx-text-fill: #5a8fa8;"/>
+                    <TextField fx:id="waterFlowMinField" GridPane.columnIndex="1" GridPane.rowIndex="0"
+                               style="-fx-background-color: #1a2535; -fx-text-fill: #e8f4fd; -fx-border-color: #1e3a52; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 8 12;"/>
+
+                    <Label text="Water Flow Max (L/min)" GridPane.columnIndex="0" GridPane.rowIndex="1"
+                           style="-fx-text-fill: #5a8fa8;"/>
+                    <TextField fx:id="waterFlowMaxField" GridPane.columnIndex="1" GridPane.rowIndex="1"
+                               style="-fx-background-color: #1a2535; -fx-text-fill: #e8f4fd; -fx-border-color: #1e3a52; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 8 12;"/>
+
+                    <Label text="Temperature Min (°C)" GridPane.columnIndex="0" GridPane.rowIndex="2"
+                           style="-fx-text-fill: #5a8fa8;"/>
+                    <TextField fx:id="tempMinField" GridPane.columnIndex="1" GridPane.rowIndex="2"
+                               style="-fx-background-color: #1a2535; -fx-text-fill: #e8f4fd; -fx-border-color: #1e3a52; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 8 12;"/>
+
+                    <Label text="Temperature Max (°C)" GridPane.columnIndex="0" GridPane.rowIndex="3"
+                           style="-fx-text-fill: #5a8fa8;"/>
+                    <TextField fx:id="tempMaxField" GridPane.columnIndex="1" GridPane.rowIndex="3"
+                               style="-fx-background-color: #1a2535; -fx-text-fill: #e8f4fd; -fx-border-color: #1e3a52; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 8 12;"/>
+
+                    <Label text="COP Min" GridPane.columnIndex="0" GridPane.rowIndex="4"
+                           style="-fx-text-fill: #5a8fa8;"/>
+                    <TextField fx:id="copMinField" GridPane.columnIndex="1" GridPane.rowIndex="4"
+                               style="-fx-background-color: #1a2535; -fx-text-fill: #e8f4fd; -fx-border-color: #1e3a52; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 8 12;"/>
+                </GridPane>
+
+                <Region VBox.vgrow="ALWAYS"/>
+                <Button text="Save Configuration" onAction="#handleSave"
+                        style="-fx-background-color: #1e5a8a; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 24; -fx-background-radius: 6; -fx-cursor: hand;"/>
+            </VBox>
+        </HBox>
+    </center>
+</BorderPane>
