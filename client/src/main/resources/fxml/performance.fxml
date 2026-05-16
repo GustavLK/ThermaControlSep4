@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="client.view.PerformanceViewController"
+            style="-fx-background-color: #0a0f1a;">
+
+    <!-- TOP NAV - samme som jeres andre views -->
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="0"
+              style="-fx-background-color: #0d1520; -fx-border-color: #1e3a52; -fx-border-width: 0 0 1 0; -fx-padding: 0 24;">
+            <Label text="ThermaControl"
+                   style="-fx-text-fill: #e8f4fd; -fx-font-size: 18px; -fx-font-weight: bold; -fx-font-family: 'Georgia'; -fx-padding: 16 24 16 0;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="Dashboard" onAction="#showDashboard"
+                    style="-fx-background-color: transparent; -fx-text-fill: #5a8fa8; -fx-border-color: transparent; -fx-padding: 10 18; -fx-cursor: hand;"/>
+            <Button text="Alarm Log" onAction="#showAlarmLog"
+                    style="-fx-background-color: transparent; -fx-text-fill: #5a8fa8; -fx-border-color: transparent; -fx-padding: 10 18; -fx-cursor: hand;"/>
+            <Button text="Configuration" onAction="#showConfig"
+                    style="-fx-background-color: transparent; -fx-text-fill: #5a8fa8; -fx-border-color: transparent; -fx-padding: 10 18; -fx-cursor: hand;"/>
+            <Button text="Performance" onAction="#showPerformance"
+                    style="-fx-background-color: #1e3a52; -fx-text-fill: #7ab3cc; -fx-border-color: transparent; -fx-padding: 10 18; -fx-cursor: hand; -fx-background-radius: 6;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="Logout" onAction="#handleLogout"
+                    style="-fx-background-color: transparent; -fx-text-fill: #5a8fa8; -fx-border-color: transparent; -fx-padding: 10 18; -fx-cursor: hand;"/>
+        </HBox>
+    </top>
+
+    <center>
+        <VBox spacing="20" style="-fx-padding: 32;">
+
+            <!-- HEADER + FILTER -->
+            <HBox alignment="CENTER_LEFT" spacing="16">
+                <Label text="Energy &amp; Cost Overview"
+                       style="-fx-text-fill: #e8f4fd; -fx-font-size: 24px; -fx-font-weight: bold;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+
+                <!-- Elpris felt så man kan justere -->
+                <Label text="El-pris (DKK/kWh):"
+                       style="-fx-text-fill: #5a8fa8; -fx-font-size: 13px;"/>
+                <TextField fx:id="elPrisField" text="3.00" prefWidth="80"
+                           style="-fx-background-color: #1a2535; -fx-text-fill: #e8f4fd; -fx-border-color: #1e3a52; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 8 12;"/>
+
+                <TextField fx:id="filterField" promptText="Filter husstande..."
+                           style="-fx-background-color: #1a2535; -fx-text-fill: #e8f4fd; -fx-prompt-text-fill: #3a5a72; -fx-border-color: #1e3a52; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 8 12; -fx-pref-width: 200;"/>
+            </HBox>
+
+            <!-- SUMMARY KORT -->
+            <HBox spacing="16">
+                <VBox spacing="4" HBox.hgrow="ALWAYS"
+                      style="-fx-background-color: #111827; -fx-border-color: #1e3a52; -fx-border-radius: 10; -fx-background-radius: 10; -fx-border-width: 1; -fx-padding: 16;">
+                    <Label text="TOTAL FORBRUG" style="-fx-text-fill: #5a8fa8; -fx-font-size: 11px;"/>
+                    <Label fx:id="totalForbrugLabel" text="— kW"
+                           style="-fx-text-fill: #7ab3cc; -fx-font-size: 26px; -fx-font-weight: bold;"/>
+                    <Label text="alle husstande" style="-fx-text-fill: #3a5a72; -fx-font-size: 11px;"/>
+                </VBox>
+                <VBox spacing="4" HBox.hgrow="ALWAYS"
+                      style="-fx-background-color: #111827; -fx-border-color: #1e3a52; -fx-border-radius: 10; -fx-background-radius: 10; -fx-border-width: 1; -fx-padding: 16;">
+                    <Label text="TOTAL PRIS/TIME" style="-fx-text-fill: #5a8fa8; -fx-font-size: 11px;"/>
+                    <Label fx:id="totalPrisLabel" text="— DKK"
+                           style="-fx-text-fill: #7ab3cc; -fx-font-size: 26px; -fx-font-weight: bold;"/>
+                    <Label text="ved nuværende elpris" style="-fx-text-fill: #3a5a72; -fx-font-size: 11px;"/>
+                </VBox>
+                <VBox spacing="4" HBox.hgrow="ALWAYS"
+                      style="-fx-background-color: #111827; -fx-border-color: #1e3a52; -fx-border-radius: 10; -fx-background-radius: 10; -fx-border-width: 1; -fx-padding: 16;">
+                    <Label text="GNSN. BRINE TEMP" style="-fx-text-fill: #5a8fa8; -fx-font-size: 11px;"/>
+                    <Label fx:id="avgTempLabel" text="— °C"
+                           style="-fx-text-fill: #7ab3cc; -fx-font-size: 26px; -fx-font-weight: bold;"/>
+                    <Label text="på tværs af pumper" style="-fx-text-fill: #3a5a72; -fx-font-size: 11px;"/>
+                </VBox>
+                <VBox spacing="4" HBox.hgrow="ALWAYS"
+                      style="-fx-background-color: #111827; -fx-border-color: #1e3a52; -fx-border-radius: 10; -fx-background-radius: 10; -fx-border-width: 1; -fx-padding: 16;">
+                    <Label text="AKTIVE PUMPER" style="-fx-text-fill: #5a8fa8; -fx-font-size: 11px;"/>
+                    <Label fx:id="aktivePumperLabel" text="—"
+                           style="-fx-text-fill: #7ab3cc; -fx-font-size: 26px; -fx-font-weight: bold;"/>
+                    <Label text="forbundet" style="-fx-text-fill: #3a5a72; -fx-font-size: 11px;"/>
+                </VBox>
+            </HBox>
+
+            <!-- TABEL -->
+            <TableView fx:id="performanceTable" VBox.vgrow="ALWAYS"
+                       style="-fx-background-color: #111827; -fx-border-color: #1e3a52; -fx-border-radius: 10; -fx-background-radius: 10;">
+                <columns>
+                    <TableColumn fx:id="idCol" text="Husstand ID" prefWidth="150"
+                                 style="-fx-text-fill: #7ab3cc;"/>
+                    <TableColumn fx:id="tempCol" text="Brine Temp (°C)" prefWidth="150"
+                                 style="-fx-text-fill: #7ab3cc;"/>
+                    <TableColumn fx:id="forbrugCol" text="Forbrug (kW)" prefWidth="150"
+                                 style="-fx-text-fill: #7ab3cc;"/>
+                    <TableColumn fx:id="copCol" text="COP" prefWidth="100"
+                                 style="-fx-text-fill: #7ab3cc;"/>
+                    <TableColumn fx:id="prisCol" text="Pris/time (DKK)" prefWidth="160"
+                                 style="-fx-text-fill: #7ab3cc;"/>
+                    <TableColumn fx:id="statusCol" text="Status" prefWidth="120"
+                                 style="-fx-text-fill: #7ab3cc;"/>
+                </columns>
+            </TableView>
+
+        </VBox>
+    </center>
+</BorderPane>

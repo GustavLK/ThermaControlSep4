@@ -57,6 +57,9 @@ public class ConfigViewController implements BaseViewController {
             configViewModel.removeClient(index);
         }
     }
+    @FXML private void showPerformance() {
+        viewHandler.openView(ViewScene.CONFIGURATION);
+    }
 
     @FXML
     private void handleSave() {

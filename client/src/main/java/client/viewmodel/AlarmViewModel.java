@@ -38,4 +38,5 @@ public class AlarmViewModel implements PropertyChangeListener {
             support.firePropertyChange("alarm", null, evt.getNewValue());
         }
     }
+
 }

@@ -7,12 +7,14 @@ public class ViewModelHandler {
     private DashboardViewModel dashboardViewModel;
     private AlarmViewModel alarmViewModel;
     private ConfigViewModel configViewModel;
+    private PerformanceViewModel performanceViewModel;
 
     public ViewModelHandler(ModelHandler modelHandler) {
         this.modelHandler = modelHandler;
         this.dashboardViewModel = new DashboardViewModel(modelHandler);
         this.alarmViewModel = new AlarmViewModel(modelHandler);
         this.configViewModel = new ConfigViewModel(modelHandler);
+        this.performanceViewModel = new PerformanceViewModel(modelHandler);
     }
 
     public DashboardViewModel getDashboardViewModel() {
@@ -29,5 +31,9 @@ public class ViewModelHandler {
 
     public ModelHandler getModelHandler() {
         return modelHandler;
+    }
+
+    public PerformanceViewModel getPerformanceViewModel() {
+        return performanceViewModel;
     }
 }

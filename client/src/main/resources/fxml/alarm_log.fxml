@@ -19,6 +19,8 @@
                     style="-fx-background-color: #1e3a52; -fx-text-fill: #7ab3cc; -fx-border-color: transparent; -fx-padding: 10 18; -fx-cursor: hand; -fx-background-radius: 6;"/>
             <Button text="Configuration" onAction="#showConfig"
                     style="-fx-background-color: transparent; -fx-text-fill: #5a8fa8; -fx-border-color: transparent; -fx-padding: 10 18; -fx-cursor: hand;"/>
+            <Button text="Performance" onAction="#showPerformance"
+                    style="-fx-background-color: transparent; -fx-text-fill: #5a8fa8; -fx-border-color: transparent; -fx-padding: 10 18; -fx-cursor: hand;"/>
             <Region HBox.hgrow="ALWAYS"/>
             <Button text="Logout" onAction="#handleLogout"
                     style="-fx-background-color: transparent; -fx-text-fill: #5a8fa8; -fx-border-color: transparent; -fx-padding: 10 18; -fx-cursor: hand;"/>

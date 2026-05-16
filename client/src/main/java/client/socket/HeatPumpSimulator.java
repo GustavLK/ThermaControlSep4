@@ -64,7 +64,6 @@ public class HeatPumpSimulator {
     }
 
     private double generateCOP() {
-        // Realistisk COP omkring jeres winter COP ca. 3.4
         // Nogle værdier kan komme under 2.5, så alarm kan testes.
         double min = 2.2;
         double max = 4.0;

@@ -196,6 +196,11 @@ public class DashboardViewController implements BaseViewController, PropertyChan
         alarmViewModel.removeListener(this);
         viewHandler.openView(ViewScene.CONFIGURATION);
     }
+    @FXML private void showPerformance() {
+        dashboardViewModel.removeListener(this);
+        alarmViewModel.removeListener(this);
+        viewHandler.openView(ViewScene.PERFORMANCE);
+    }
 
     @FXML private void handleLogout() {
         dashboardViewModel.removeListener(this);

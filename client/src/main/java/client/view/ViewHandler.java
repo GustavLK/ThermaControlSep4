@@ -34,6 +34,7 @@ public class ViewHandler {
                 case DASHBOARD -> "dashboard.fxml";
                 case ALARM_LOG -> "alarm_log.fxml";
                 case CONFIGURATION -> "config.fxml";
+                case PERFORMANCE -> "performance.fxml";
             };
 
             URL url = getClass().getResource("/fxml/" + fxmlFile);

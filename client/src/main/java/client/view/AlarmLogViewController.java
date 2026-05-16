@@ -108,4 +108,7 @@ public class AlarmLogViewController implements BaseViewController, PropertyChang
         alarmViewModel.removeListener(this);
         viewHandler.openView(ViewScene.LOGIN);
     }
+    @FXML private void showPerformance() {
+        viewHandler.openView(ViewScene.PERFORMANCE);
+    }
 }
